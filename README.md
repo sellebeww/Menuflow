@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="assets/logo-original.png" alt="Menuflow" width="220">
+<img src="assets/logo-original-nobg.png" alt="Menuflow" width="300">
 
-# Menuflow
+### Better Choices. Smarter Preparation.
 
-**Better Choices. Smarter Preparation.**
+<p>Platform pemesanan makanan fleksibel dan koordinasi permintaan dapur untuk kantin, katering, dan penyedia makanan.</p>
 
-Platform pemesanan makanan fleksibel dan koordinasi permintaan dapur untuk kantin, katering, dan penyedia makanan.
+<p><img src="https://img.shields.io/badge/JavaScript-ES%20Modules-F7DF1E?logo=javascript&logoColor=white&labelColor=3a3f47" alt="JavaScript ES Modules"> <img src="https://img.shields.io/badge/Node.js-dev%20server-339933?logo=nodedotjs&logoColor=white&labelColor=3a3f47" alt="Node.js dev server"> <img src="https://img.shields.io/badge/mode-prototype-d4a017?labelColor=3a3f47" alt="mode prototype"> <img src="https://img.shields.io/badge/license-MIT-1e3a8a?labelColor=3a3f47" alt="license MIT"></p>
 
 </div>
 
