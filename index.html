@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menuflow · Better Choices. Smarter Preparation.</title>
+<meta name="description" content="Menuflow adalah platform pemesanan makanan fleksibel dan koordinasi permintaan dapur untuk kantin, katering, dan penyedia makanan.">
+<meta name="theme-color" content="#176B65">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/logo-mark.png">
+<link rel="stylesheet" href="site/css/site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Lewati ke konten</a>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#beranda" aria-label="Menuflow, ke atas"><span class="mk" style="--h:34px"></span><span class="wm">Menuflow</span></a>
+    <nav class="links" id="links" aria-label="Navigasi utama">
+      <a href="#beranda">Beranda</a><a href="#cara-kerja">Cara Kerja</a><a href="#bisnis">Untuk Bisnis</a><a href="#tentang">Tentang Kami</a>
+      <a class="login" href="app/index.html">Login</a>
+    </nav>
+    <a class="btn btn-solid" href="app/index.html" id="cta-nav">Mulai Sekarang</a>
+    <button class="burger" id="burger" aria-label="Buka menu" aria-expanded="false" aria-controls="links"><i></i><i></i></button>
+  </div>
+</header>
+
+<main id="main">
+<!-- ============ HERO ============ -->
+<section class="hero" id="beranda">
+  <svg class="hero-ribbon" viewBox="0 0 1200 520" fill="none" aria-hidden="true">
+    <path class="rb rb-a" d="M-40 330C120 150 300 120 470 250S760 420 930 270 1180 110 1260 190"/>
+    <path class="rb rb-b" d="M-60 420C140 300 320 330 500 410S820 470 1000 330 1190 250 1280 290"/>
+  </svg>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow reveal"><span class="spark"></span> Flexible meal ordering &amp; kitchen demand coordination</p>
+      <h1 class="h-xl" aria-label="Your Meal Choices. A Smarter Kitchen.">
+        <span class="line"><span class="w" style="--i:0">Your</span> <span class="w" style="--i:1">Meal</span> <span class="w" style="--i:2">Choices.</span></span>
+        <span class="line"><span class="w" style="--i:3">A</span> <span class="w hl" style="--i:4">Smarter</span> <span class="w" style="--i:5">Kitchen.</span></span>
+      </h1>
+      <p class="lead reveal" style="--d:.5s">Pesan makanan dengan lebih fleksibel. Bantu dapur menyesuaikan produksi dengan pilihan pelanggan dan mengurangi makanan yang tidak terserap.</p>
+      <div class="cta-row reveal" style="--d:.65s">
+        <a class="btn btn-solid btn-lg" href="app/index.html">Mulai Memesan <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        <a class="btn btn-ghost btn-lg" href="#cara-kerja">Pelajari Cara Kerja</a>
+      </div>
+      <p class="fine reveal" style="--d:.8s">Prototype interaktif. Data bersifat simulasi.</p>
+    </div>
+
+    <!-- live allocation stage -->
+    <div class="stage reveal" style="--d:.3s" id="stage" aria-label="Simulasi alokasi Menuflow">
+      <div class="stage-top">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <b id="stage-phase">Pesanan masuk</b>
+        <button class="mini-btn" id="stage-replay" aria-label="Putar ulang simulasi">Ulangi</button>
+      </div>
+      <div class="stage-body">
+        <div class="col col-tickets"><h3>Pilihan pelanggan</h3><ul id="tickets" aria-label="Daftar pesanan"></ul></div>
+        <div class="col col-menus"><h3>Kapasitas dapur</h3><div id="menus"></div></div>
+      </div>
+      <div class="stage-foot" aria-live="polite">
+        <div><strong id="s-main">0</strong><span>menu utama</span></div>
+        <div><strong id="s-alt">0</strong><span>via alternatif</span></div>
+        <div class="warn"><strong id="s-un">0</strong><span>perlu ditinjau</span></div>
+      </div>
+      <p class="stage-note">Simulasi: pass 1 melayani pilihan utama, pass 2 hanya memakai alternatif yang disetujui pelanggan.</p>
+    </div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true"><div class="mq"><span>Pilihan</span><i></i><span>Persetujuan</span><i></i><span>Koordinasi</span><i></i><span>Efisiensi</span><i></i><span>Tanggung jawab</span><i></i><span>Pilihan</span><i></i><span>Persetujuan</span><i></i><span>Koordinasi</span><i></i><span>Efisiensi</span><i></i><span>Tanggung jawab</span><i></i></div></div>
+
+<!-- ============ PROBLEM / COMPARE ============ -->
+<section class="sec" id="masalah">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow">Masalahnya</p>
+      <h2 class="h-lg">Satu menu habis, menu lain tersisa.</h2>
+      <p class="lead">Dapur menebak berapa porsi per menu. Pelanggan hanya bisa memilih satu. Hasilnya: sebagian pulang tanpa makan, sebagian porsi tidak terambil. Menuflow mengubah satu pilihan menjadi beberapa pilihan yang disetujui.</p>
+    </div>
+    <div class="compare reveal">
+      <div class="seg" role="tablist" aria-label="Bandingkan cara pemesanan">
+        <button role="tab" aria-selected="true" data-mode="old" class="on">Satu pilihan</button>
+        <button role="tab" aria-selected="false" data-mode="new">Dengan Menuflow</button>
+      </div>
+      <div class="cmp-grid">
+        <div class="cmp-bars" id="cmp-bars"></div>
+        <div class="cmp-result">
+          <div class="res"><strong data-k="served">47</strong><span>pelanggan mendapat menu</span></div>
+          <div class="res bad"><strong data-k="un">5</strong><span>pelanggan tanpa menu</span></div>
+          <div class="res bad2"><strong data-k="left">3</strong><span>porsi tidak terambil</span></div>
+          <p class="fine">Ilustrasi sederhana: 3 menu, kapasitas 20/15/15, 52 pesanan. Bukan hasil uji lapangan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="sec sec-mint" id="cara-kerja">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow">Cara kerja</p><h2 class="h-lg">Tiga langkah dari pilihan ke piring.</h2></div>
+    <ol class="steps">
+      <li class="step reveal">
+        <div class="step-copy"><span class="num">01</span><h3>Pilih Preferensimu</h3><p>Pilih menu utama dan beberapa alternatif yang masih sesuai dengan selera serta kebutuhanmu.</p></div>
+        <div class="mock phone-mock" aria-hidden="true">
+          <div class="pm-h">Pilih Menumu</div>
+          <div class="pm-card sel"><b>Chicken Teriyaki Rice</b><span>Rp25.000</span><em>Pilihan utamamu</em></div>
+          <div class="pm-sub">Alternatif yang kamu terima</div>
+          <div class="pm-row"><span>Chicken Katsu Rice</span><i class="tg on"></i></div>
+          <div class="pm-row"><span>Beef Black Pepper Rice</span><i class="tg"></i></div>
+        </div>
+      </li>
+      <li class="step reveal">
+        <div class="step-copy"><span class="num">02</span><h3>Dapur Menyelaraskan Produksi</h3><p>Dapur menggunakan pilihan pelanggan untuk menyesuaikan jumlah setiap menu sebelum produksi dimulai.</p></div>
+        <div class="mock kitchen-mock" aria-hidden="true">
+          <div class="km-h">Pratinjau Alokasi <b>Draf</b></div>
+          <table><tr><td>SS-001</td><td>Teriyaki</td><td><span class="pill ok">Sesuai</span></td></tr><tr><td>SS-003</td><td>Katsu → Teriyaki</td><td><span class="pill info">Alternatif</span></td></tr><tr><td>SS-004</td><td>Beef Black Pepper</td><td><span class="pill warn">Belum ada menu</span></td></tr></table>
+          <div class="km-bar"><i style="--w:100%"></i><i style="--w:86%"></i><i style="--w:62%"></i></div>
+        </div>
+      </li>
+      <li class="step reveal">
+        <div class="step-copy"><span class="num">03</span><h3>Terima Menu yang Dikonfirmasi</h3><p>Setelah alokasi selesai, pelanggan menerima konfirmasi menu yang akan disiapkan.</p></div>
+        <div class="mock track-mock" aria-hidden="true">
+          <div class="tk done"><i></i><div><b>Pesanan diterima</b></div></div><div class="tk done"><i></i><div><b>Menunggu alokasi</b></div></div><div class="tk cur"><i></i><div><b>Menu dikonfirmasi</b><span>Chicken Katsu Rice</span></div></div><div class="tk"><i></i><div><b>Siap diambil</b></div></div>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ SAFETY / PRINCIPLES ============ -->
+<section class="sec" id="prinsip">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow">Prinsip</p><h2 class="h-lg">Fleksibel, tapi tidak pernah memaksa.</h2><p class="lead">Menuflow bukan menu kejutan. Setiap hasil alokasi dibatasi oleh apa yang pelanggan setujui.</p></div>
+    <div class="principles">
+      <article class="pr reveal"><span class="pr-n">01</span><h3>Persetujuan adalah batas</h3><p>Menu yang tidak dipilih tidak akan pernah dialokasikan kepada pelanggan.</p></article>
+      <article class="pr reveal" style="--d:.08s"><span class="pr-n">02</span><h3>Alergi bukan preferensi</h3><p>Alergi dan pantangan menjadi batas mutlak. Info alergen yang belum lengkap tidak dianggap aman.</p></article>
+      <article class="pr reveal" style="--d:.16s"><span class="pr-n">03</span><h3>Aturan yang terlihat</h3><p>Antrean berdasarkan waktu pesan. Tanpa AI tersembunyi, tanpa acak, setiap alasan bisa dibaca.</p></article>
+      <article class="pr reveal" style="--d:.24s"><span class="pr-n">04</span><h3>Merchant yang memutuskan</h3><p>Preview alokasi ditinjau dan dapat diubah sebelum dipublikasikan ke pelanggan.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VALUE ============ -->
+<section class="sec sec-dark" id="nilai">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow light">Nilai</p><h2 class="h-lg">Permintaan dan Persiapan, Lebih Selaras.</h2></div>
+    <div class="values">
+      <article class="val reveal"><div class="val-ic"><svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><h3>Untuk Pelanggan</h3><ul><li>Lebih banyak pilihan.</li><li>Tidak perlu bergantung pada satu menu.</li><li>Mendapatkan kepastian menu sebelum pengambilan.</li></ul></article>
+      <article class="val reveal" style="--d:.1s"><div class="val-ic"><svg viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><path d="M6 17h12"/></svg></div><h3>Untuk Dapur</h3><ul><li>Melihat gambaran permintaan yang lebih fleksibel.</li><li>Menyesuaikan kapasitas produksi.</li><li>Mengurangi ketidaksesuaian antara menu yang diproduksi dan pilihan pelanggan.</li></ul></article>
+      <article class="val reveal" style="--d:.2s"><div class="val-ic"><svg viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></div><h3>Untuk Keberlanjutan</h3><ul><li>Mengurangi potensi makanan tersisa.</li><li>Mengoptimalkan penggunaan bahan.</li><li>Membantu membangun kebiasaan konsumsi yang lebih bertanggung jawab.</li></ul></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRODUCT TOUR ============ -->
+<section class="sec" id="produk">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow">Produk</p><h2 class="h-lg">Dua sisi, satu alur.</h2><p class="lead">Aplikasi pelanggan yang ringan, dashboard dapur yang jelas. Status pesanan selalu sama di kedua sisi.</p></div>
+    <div class="tour reveal">
+      <div class="tabs" role="tablist" aria-label="Pilih sisi produk">
+        <button role="tab" aria-selected="true" class="on" data-tab="c"><b>Aplikasi Pelanggan</b><span>Mobile-first. Pilih, setujui, pantau.</span></button>
+        <button role="tab" aria-selected="false" data-tab="m"><b>Dasbor Merchant</b><span>Permintaan, kapasitas, alokasi, produksi.</span></button>
+        <a class="btn btn-solid" href="app/index.html">Coba prototype interaktif</a>
+      </div>
+      <div class="tour-view">
+        <div class="tv tv-c on" id="tv-c">
+          <div class="phone"><div class="ph-top">Sesi Makan Hari Ini</div><div class="ph-card"><small>Menuflow Campus Canteen</small><b>Makan Siang</b><div class="ph-facts"><span>Ambil 12.00–13.30</span><span>Batas 10.30</span></div><div class="ph-btn">Pilih Menu</div></div><div class="ph-steps"><i>1</i> Pilih satu menu utama<br><i>2</i> Tambahkan alternatif<br><i>3</i> Terima menu final</div></div>
+          <div class="phone p2"><div class="ph-top">Status Pesanan</div><div class="ph-ref">SS-2026-049</div><div class="ph-track"><span class="d"></span><span class="d"></span><span class="c"></span><span></span></div><div class="ph-card ok"><small>Menu dikonfirmasi</small><b>Chicken Katsu Rice</b><small>Alternatif yang kamu setujui</small></div></div>
+        </div>
+        <div class="tv tv-m" id="tv-m">
+          <div class="dash"><div class="dash-side"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+            <div class="dash-main"><div class="dash-kpis"><div><b>48</b><span>Total Pesanan</span></div><div><b>42</b><span>Sesuai</span></div><div><b>3</b><span>Alternatif</span></div><div class="w"><b>3</b><span>Belum ada menu</span></div></div>
+              <div class="dash-chart" id="dash-chart"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NUMBERS ============ -->
+<section class="sec sec-mint" id="angka">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow">Dari prototype</p><h2 class="h-lg">48 pesanan, 50 porsi, satu hasil yang bisa diperiksa.</h2></div>
+    <div class="nums">
+      <div class="num-card reveal"><strong data-count="48">0</strong><span>Total pesanan</span></div>
+      <div class="num-card ok reveal" style="--d:.08s"><strong data-count="42">0</strong><span>Menu utama terpenuhi</span></div>
+      <div class="num-card info reveal" style="--d:.16s"><strong data-count="3">0</strong><span>Alternatif yang disetujui</span></div>
+      <div class="num-card warn reveal" style="--d:.24s"><strong data-count="3">0</strong><span>Belum ada menu, ditinjau merchant</span></div>
+    </div>
+    <p class="fine center">Hasil pratinjau alokasi pada data demo prototype (data simulasi). Menuflow tidak mengklaim persentase pengurangan sisa makanan tanpa data uji lapangan.</p>
+  </div>
+</section>
+
+<!-- ============ BUSINESS ============ -->
+<section class="sec" id="bisnis">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow">Untuk bisnis</p><h2 class="h-lg">B2B SaaS, disesuaikan skala operasional.</h2><p class="lead">Harga ditentukan setelah konsultasi kebutuhan. Tidak ada transaksi langganan pada prototype.</p></div>
+    <div class="plans">
+      <article class="plan reveal"><h3>Starter</h3><p>Untuk kantin kecil dan usaha makanan yang baru mencoba sistem.</p><ul><li>Pengelolaan sesi makanan</li><li>Pengelolaan menu</li><li>Pemesanan fleksibel</li><li>Alokasi dasar</li><li>Laporan dasar</li></ul><a class="btn btn-ghost" href="#kontak">Minta Demo</a></article>
+      <article class="plan hl reveal" style="--d:.1s"><span class="tag">Paling relevan untuk kampus</span><h3>Growth</h3><p>Untuk kantin dengan jumlah pelanggan berulang yang lebih besar.</p><ul><li>Semua fitur Starter</li><li>Laporan lanjutan</li><li>Pengelolaan multi-sesi</li><li>Wawasan pelanggan</li><li>Ekspor laporan</li></ul><a class="btn btn-solid" href="#kontak">Minta Demo</a></article>
+      <article class="plan reveal" style="--d:.2s"><h3>Enterprise</h3><p>Untuk perusahaan katering, kampus, dan jaringan kantin.</p><ul><li>Pengelolaan multi-lokasi</li><li>Dasbor terpusat</li><li>Pengaturan operasional khusus</li><li>Laporan kinerja lanjutan</li><li>Dukungan khusus</li></ul><a class="btn btn-ghost" href="#kontak">Hubungi Kami</a></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="sec sec-sage" id="tentang">
+  <div class="wrap about">
+    <div class="reveal"><p class="eyebrow">Tentang kami</p><h2 class="h-lg">Pelanggan memilih lebih fleksibel. Dapur menyiapkan lebih tepat. Makanan dikelola lebih bertanggung jawab.</h2></div>
+    <div class="about-r">
+      <p class="lead reveal">Menuflow adalah platform koordinasi permintaan dan produksi makanan. Kami percaya makanan yang diproduksi harus sesuai dengan pilihan orang yang akan menyantapnya, tanpa memaksa siapa pun menerima sesuatu yang tidak mereka setujui.</p>
+      <ol class="road reveal">
+        <li class="done"><b>Prototype</b><span>Alur pelanggan, dashboard dapur, dan alokasi yang dapat dicoba.</span></li>
+        <li><b>Pilot kantin kampus</b><span>Rencana: uji dengan satu kantin dan ukur sisa makanan secara nyata.</span></li>
+        <li><b>Multi-lokasi</b><span>Rencana: dashboard terpusat untuk katering dan jaringan kantin.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta" id="kontak">
+  <div class="wrap cta-in">
+    <h2 class="h-xl">Make Every Meal Count.</h2>
+    <p class="lead">Mulai menyelaraskan pilihan pelanggan dengan persiapan dapur.</p>
+    <div class="cta-row"><a class="btn btn-solid btn-lg" href="app/index.html">Jelajahi Menuflow</a><a class="btn btn-ghost btn-lg" href="#kontak" id="demo-btn">Minta Demo</a></div>
+    <p class="fine" id="demo-msg" hidden>Terima kasih. Ini halaman prototype, jadi permintaan demo belum terkirim ke siapa pun.</p>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand"><a class="brand" href="#beranda"><span class="mk" style="--h:30px"></span><span class="wm">Menuflow</span></a><p>Platform pemesanan makanan fleksibel dan koordinasi permintaan dapur.</p></div>
+    <div><h4>Produk</h4><a href="#cara-kerja">Cara Kerja</a><a href="#produk">Produk</a><a href="#prinsip">Prinsip</a></div>
+    <div><h4>Untuk Pelanggan</h4><a href="app/index.html#/c/home">Aplikasi Pelanggan</a></div>
+    <div><h4>Untuk Merchant</h4><a href="app/index.html#/m/overview">Dasbor Merchant</a><a href="#bisnis">Paket</a></div>
+    <div><h4>Tentang</h4><a href="#tentang">Tentang Kami</a><a href="#kontak">Kontak</a></div>
+    <div><h4>Legal</h4><a href="#" data-soon>Kebijakan Privasi</a><a href="#" data-soon>Syarat Layanan</a></div>
+  </div>
+  <div class="wrap foot-bot"><span>© 2026 Menuflow. Prototype untuk keperluan demonstrasi.</span><span>Semua data pada situs ini adalah data simulasi.</span></div>
+</footer>
+<script src="site/js/site.js"></script>
+</body>
+</html>
