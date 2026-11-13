@@ -2,10 +2,11 @@ import { getState, subscribe, quiet, simNow, effStatus, resetDemo } from './stor
 import * as C from './customer.js';
 import * as M from './merchant.js';
 import { actions, go } from './actions.js';
-import { logo, icon, closeModal, dateShort, clock } from './ui.js';
+import { logo, icon, closeModal, dateShort, clock, focusKey, refocus, trapTab } from './ui.js';
 
 const app = document.getElementById('app');
 actions.closeModal = closeModal;
+actions.skipMain = () => document.getElementById('scroll')?.focus();
 
 /* ---------- role screen ---------- */
 function roleScreen() {
@@ -53,15 +54,15 @@ function merchantView(p) {
   const fn = views[page] || M.overview;
   const pend = st.orders.filter(o => o.sessionId === st.ui.selectedSession && ['pending', 'unresolved'].includes(o.status)).length;
   const un = st.notifications.filter(n => n.to === 'merchant' && !n.read).length;
-  return `<div class="m-shell"><aside class="m-side"><div class="m-brand">${logo(30)}</div><nav aria-label="Menu merchant">${MNAV.map(([k, t, ic]) => `<a href="#/m/${k}" class="${page === k ? 'on' : ''}" ${page === k ? 'aria-current="page"' : ''}>${icon(ic, 18)}<span>${t.replace('&', '&amp;')}</span>${k === 'allocation' && pend ? `<em>${pend}</em>` : ''}</a>`).join('')}</nav>
+  return `<div class="m-shell"><button type="button" class="skip-link" data-act="skipMain">Lewati ke konten utama</button><aside class="m-side"><div class="m-brand">${logo(30)}</div><nav aria-label="Menu merchant">${MNAV.map(([k, t, ic]) => `<a href="#/m/${k}" class="${page === k ? 'on' : ''}" ${page === k ? 'aria-current="page"' : ''}>${icon(ic, 18)}<span>${t.replace('&', '&amp;')}</span>${k === 'allocation' && pend ? `<em>${pend}</em>` : ''}</a>`).join('')}</nav>
   <div class="m-foot"><a href="#/">${icon('left', 14)} Ganti peran</a></div></aside>
   <div class="m-main"><header class="m-top"><div><b>Menuflow Campus Canteen</b><span class="muted"> · ${dateShort(simNow())} · <span data-clock>${clock(simNow())}</span> <em class="demo">jam demo</em></span></div>
   <div class="row gap"><button class="icon-btn bell" data-act="openMNotifs" aria-label="Notifikasi, ${un} belum dibaca">${icon('bell')}${un ? `<span class="dot">${un}</span>` : ''}</button><span class="role-chip">${icon('chef', 14)} Merchant</span><span class="avatar sm" aria-label="Profil">K</span></div></header>
-  <main class="m-content" id="scroll">${fn()}</main></div></div>`;
+  <main class="m-content" id="scroll" tabindex="-1">${fn()}</main></div></div>`;
 }
 
 /* ---------- router ---------- */
-let lastKey = '';
+let lastKey = '', rendered = false;
 function render() {
   const p = (location.hash.replace(/^#\/?/, '') || '').split('/');
   const key = location.hash;
@@ -69,11 +70,14 @@ function render() {
   let html;
   if (p[0] === 'c') html = customerView(p); else if (p[0] === 'm') html = merchantView(p); else html = roleScreen();
   if (html == null) return;
-  const focusId = document.activeElement?.getAttribute?.('data-act');
+  const fk = focusKey(document.activeElement);
   app.innerHTML = html;
   const n = document.getElementById('scroll');
   if (n && key === lastKey) { n.scrollTop = top; window.scrollTo(0, wtop); } else { window.scrollTo(0, 0); }
-  lastKey = key; tick();
+  // Keyboard users keep their place after an action; on navigation, focus moves to the new page heading.
+  const modalOpen = document.getElementById('modal-root').children.length > 0; // never pull focus out of an open dialog
+  if (rendered && !modalOpen && !(key === lastKey && refocus(fk))) { const h = app.querySelector('h1'); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } }
+  lastKey = key; rendered = true; tick();
 }
 const pad = n => String(n).padStart(2, '0');
 function tick() {
@@ -107,7 +111,7 @@ document.addEventListener('input', e => {
   if (el.dataset.bind) C.onBind(el.dataset.bind, el.value);
   if ('search' in el.dataset) M.onSearch(el.value);
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); else if (e.key === 'Tab') trapTab(e); });
 
 actions.enter = ({ role }, e) => {
   const b = e.target.closest('button'); b.classList.add('loading'); b.disabled = true;

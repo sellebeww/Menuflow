@@ -65,23 +65,59 @@ export function dish(art, cls = '') {
 <path d="M56 86q54-40 108 0q-54 20-108 0Z" fill="#fff" stroke="#e5eaE7"/><g>${top}</g></svg>`;
 }
 
+/* focus helpers: the app re-renders by replacing innerHTML, which would otherwise drop keyboard focus */
+const KEYED = 'a[href],button,input,select,textarea,[tabindex]';
+const sig = e => [e.tagName, e.id, e.getAttribute('name') || '', JSON.stringify(e.dataset)].join('|');
+/** Identify a focused element by what it is, so the same control can be found after a re-render. */
+export function focusKey(el, root = document.getElementById('app')) {
+  if (!el || !root || !root.contains(el)) return null;
+  const s = sig(el);
+  return { s, i: [...root.querySelectorAll(KEYED)].filter(e => sig(e) === s).indexOf(el) };
+}
+/** Focus the control `key` describes. Returns false when it is gone or cannot take focus. */
+export function refocus(key, root = document.getElementById('app')) {
+  if (!key || !root) return false;
+  const el = [...root.querySelectorAll(KEYED)].filter(e => sig(e) === key.s)[key.i];
+  if (!el || el.disabled) return false;
+  el.focus({ preventScroll: true });
+  return document.activeElement === el;
+}
+
 /* modal + toast */
+let modalSeq = 0;
 export function openModal(html, { wide = false, sheet = false } = {}) {
   const root = document.getElementById('modal-root');
   const el = document.createElement('div');
   el.className = 'modal-back' + (sheet ? ' sheet' : '');
   el.innerHTML = `<div class="modal${wide ? ' wide' : ''}" role="dialog" aria-modal="true" tabindex="-1">${html}</div>`;
-  root.appendChild(el);
+  const heading = el.querySelector('h2');
+  if (heading) { heading.id = heading.id || `modal-title-${++modalSeq}`; el.firstElementChild.setAttribute('aria-labelledby', heading.id); }
   const prev = document.activeElement;
-  el._prev = prev;
+  el._prev = prev; el._prevKey = focusKey(prev);
+  root.appendChild(el);
+  document.getElementById('app')?.setAttribute('inert', ''); // background is unreachable while a dialog is open
   const first = el.querySelector('[autofocus],input,select,textarea,button.btn-primary') || el.querySelector('.modal');
   first && first.focus();
   return el;
 }
+/** Keep Tab / Shift+Tab inside the topmost dialog. */
+export function trapTab(e) {
+  const el = document.getElementById('modal-root')?.lastElementChild;
+  if (!el) return;
+  const items = [...el.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(x => x.offsetParent !== null);
+  const box = el.firstElementChild, act = document.activeElement;
+  if (!items.length) { e.preventDefault(); box.focus(); return; }
+  const first = items[0], last = items[items.length - 1];
+  if (!el.contains(act)) { e.preventDefault(); first.focus(); }
+  else if (e.shiftKey && (act === first || act === box)) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && act === last) { e.preventDefault(); first.focus(); }
+}
 export function closeModal() {
   const root = document.getElementById('modal-root'), el = root.lastElementChild;
   if (!el) return;
-  const prev = el._prev; el.remove(); prev && prev.isConnected && prev.focus();
+  const prev = el._prev; el.remove();
+  if (!root.children.length) document.getElementById('app')?.removeAttribute('inert');
+  if (prev && prev.isConnected) prev.focus(); else refocus(el._prevKey);
 }
 export function toast(msg, kind = 'ok') {
   const t = document.createElement('div');
