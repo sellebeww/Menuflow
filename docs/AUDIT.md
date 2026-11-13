@@ -69,6 +69,8 @@ Diperiksa dengan `page.pdf()` Chromium (A4).
 
 ## E. Hal lain
 
-- Hanya satu tes dan tanpa CI; ditambahkan (lihat PR).
+- Hanya satu tes dan tanpa CI; ditambahkan: 63 tes `node:test` dan workflow CI.
+- Tes e2e Playwright **belum** ada: pemasangan devDependency (`@playwright/test`) belum bisa dilakukan pada sesi ini. Verifikasi 360px, cetak, kontras, dan keyboard dilakukan dengan skrip Playwright sekali pakai (di luar repo) pada Chromium terpasang; hasilnya dirangkum di PR.
+- Hasil cetak A4 dua halaman (kartu "Status pengambilan" pindah utuh ke halaman 2, tidak terpotong). Bukti: `docs/verification/print-a4-1.png` (font cadangan karena Google Fonts diblokir saat verifikasi).
 - Font Google Fonts dimuat dari jaringan; tanpa jaringan, font cadangan dipakai. Tidak diubah.
-- Tidak ada linter/typecheck pada repo; menambah linter dianggap perubahan di luar mode aman minimal dan dicatat di PR.
+- Tidak ada linter/typecheck pada repo; ditambahkan hanya `npm run check` (sintaks). Menambah ESLint/TypeScript dianggap di luar mode aman minimal dan dicatat di PR.
