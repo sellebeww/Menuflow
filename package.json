@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "node dev.mjs",
+    "check": "node scripts/check-syntax.mjs",
     "test": "node --test tests/*.test.mjs"
   }
 }

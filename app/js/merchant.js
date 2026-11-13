@@ -1,6 +1,7 @@
 import { getState, mutate, quiet, resetDemo, menuOf, sessionOf, orderOf, effStatus, cutoffTs, simNow, notify } from './store.js';
 import { esc, rp, hm, clock, dateShort, ago, icon, dish, badge, statusBadge, STATUS, openModal, closeModal, toast, confirmDialog } from './ui.js';
 import { conflicts, ALLERGENS, DIET, approvedIds, capacityMap, generatePreview, summarize, validateOverride, applyOverride, confirmAllocation } from './allocation.js';
+import { buildPlan, planText as buildPlanText } from './production.js';
 import { actions, go } from './actions.js';
 
 const S = () => getState();
@@ -217,23 +218,19 @@ const rulesCard = () => `<section class="card"><h2>Aturan Alokasi &amp; Keadilan
 
 /* ---------- production plan ---------- */
 export function production() {
-  const s = curSession(), L = live(s.id), fin = L.filter(o => o.finalMenu), cap = capacityMap(s, S().orders);
-  const total = fin.length, totCap = s.menus.reduce((a, m) => a + m.capacity, 0);
+  const s = curSession(), plan = buildPlan(s, S().orders, S().menus), { total, totalCapacity: totCap } = plan;
   if (!total) return `${head('Rencana Produksi', 'Rencana produksi siap setelah alokasi dikonfirmasi.', sessionPicker())}<article class="card">${emptyBox('Belum ada alokasi terkonfirmasi', 'Jalankan dan publikasikan alokasi di Pusat Alokasi terlebih dahulu.')}<div class="center"><button class="btn btn-primary" data-act="nav" data-to="#/m/allocation">Buka Pusat Alokasi</button></div></article>`;
-  const notes = fin.filter(o => o.diet.length || o.allergies.length || o.otherAllergy || o.notes);
-  const rdy = fin.filter(o => o.status === 'ready').length, done = fin.filter(o => o.status === 'completed').length;
+  const { notes, pickup } = plan;
   return `${head('Rencana Produksi', 'Rencana produksimu sudah siap.', sessionPicker() + '<button class="btn" data-act="printPlan">' + icon('print', 16) + ' Cetak</button><button class="btn btn-primary" data-act="downloadPlan">' + icon('download', 16) + ' Unduh Ringkasan Produksi</button>')}
-  <div class="kpis four"><article class="kpi"><span class="muted">Total menu terkonfirmasi</span><strong>${total}</strong></article><article class="kpi"><span class="muted">Total kapasitas produksi</span><strong>${totCap}</strong></article><article class="kpi"><span class="muted">Sisa kapasitas</span><strong>${totCap - total}</strong></article><article class="kpi"><span class="muted">Jadwal pengambilan</span><strong class="sm-n">${hm(s.pickupStart)}–${hm(s.pickupEnd)}</strong><small>${esc(s.pickupLocation)}</small></article></div>
-  <article class="card"><h2>Produksi Terkonfirmasi Hari Ini</h2>${s.menus.map(m => { const c = cap[m.menuId]; return `<div class="prod"><div class="row between"><b>${esc(menuOf(m.menuId)?.name || '')}</b><span><strong class="big">${c.used}</strong> porsi <span class="muted">dari ${c.capacity}</span></span></div><div class="track big"><i class="c-first" style="width:${c.used / c.capacity * 100}%"></i></div></div>`; }).join('')}
+  <p class="print-only">${esc(s.name)} · ${dateShort(s.date)} · ${esc(s.pickupLocation)}</p>
+  <div class="kpis four"><article class="kpi"><span class="muted">Total menu terkonfirmasi</span><strong>${total}</strong></article><article class="kpi"><span class="muted">Total kapasitas produksi</span><strong>${totCap}</strong></article><article class="kpi"><span class="muted">Sisa kapasitas</span><strong>${plan.remaining}</strong></article><article class="kpi"><span class="muted">Jadwal pengambilan</span><strong class="sm-n">${hm(s.pickupStart)}–${hm(s.pickupEnd)}</strong><small>${esc(s.pickupLocation)}</small></article></div>
+  <article class="card"><h2>Produksi Terkonfirmasi Hari Ini</h2>${plan.lines.map(l => `<div class="prod"><div class="row between"><b>${esc(l.name)}</b><span><strong class="big">${l.used}</strong> porsi <span class="muted">dari ${l.capacity}</span></span></div><div class="track big" role="progressbar" aria-label="${esc(l.name)}" aria-valuemin="0" aria-valuemax="${l.capacity}" aria-valuenow="${l.used}" aria-valuetext="${l.used} dari ${l.capacity} porsi"><i class="c-first" style="width:${l.percent}%"></i></div></div>`).join('')}
   <div class="row between total"><b>Total</b><b>${total} porsi</b></div></article>
-  <div class="grid-2"><article class="card"><h2>Catatan diet khusus</h2>${notes.length ? `<ul class="plain">${notes.map(o => `<li><b>${o.id.slice(8)}</b> ${esc(o.customerName)} → ${esc(short(o.finalMenu))}<div class="muted sm">${esc([...o.diet.map(d => DIET[d]), ...o.allergies.map(a => 'Alergi ' + ALLERGENS[a]), o.otherAllergy, o.notes].filter(Boolean).join(', '))}</div></li>`).join('')}</ul>` : '<p class="muted">Tidak ada catatan khusus.</p>'}<p class="muted sm">Konfirmasi lagi kepada pelanggan dengan alergi serius. Menuflow tidak menjamin bebas kontaminasi silang.</p></article>
-  <article class="card"><h2>Status pengambilan</h2><div class="kv"><span>Terkonfirmasi</span><b>${fin.filter(o => o.status === 'confirmed').length}</b></div><div class="kv"><span>Siap diambil</span><b>${rdy}</b></div><div class="kv"><span>Sudah diambil</span><b>${done}</b></div>
-  <div class="row gap wrap mt"><button class="btn btn-primary" data-act="markAllReady" ${fin.some(o => o.status === 'confirmed') ? '' : 'disabled'}>Tandai semua siap diambil</button><button class="btn" data-act="markAllDone" ${rdy ? '' : 'disabled'}>Simulasikan pengambilan (semua)</button></div></article></div>`;
+  <div class="grid-2"><article class="card"><h2>Catatan diet khusus</h2>${notes.length ? `<ul class="plain">${notes.map(n => `<li><b>${esc(n.shortId)}</b> ${esc(n.customerName)} → ${esc(n.menu)}<div class="muted sm">${esc([...n.diet, ...n.allergies.map(a => 'Alergi ' + a), n.other, n.note].filter(Boolean).join(', '))}</div></li>`).join('')}</ul>` : '<p class="muted">Tidak ada catatan khusus.</p>'}<p class="muted sm">Konfirmasi lagi kepada pelanggan dengan alergi serius. Menuflow tidak menjamin bebas kontaminasi silang.</p></article>
+  <article class="card"><h2>Status pengambilan</h2><div class="kv"><span>Terkonfirmasi</span><b>${pickup.confirmed}</b></div><div class="kv"><span>Siap diambil</span><b>${pickup.ready}</b></div><div class="kv"><span>Sudah diambil</span><b>${pickup.completed}</b></div>
+  <div class="row gap wrap mt no-print"><button class="btn btn-primary" data-act="markAllReady" ${pickup.confirmed ? '' : 'disabled'}>Tandai semua siap diambil</button><button class="btn" data-act="markAllDone" ${pickup.ready ? '' : 'disabled'}>Simulasikan pengambilan (semua)</button></div></article></div>`;
 }
-function planText() {
-  const s = curSession(), cap = capacityMap(s, S().orders), fin = live(s.id).filter(o => o.finalMenu);
-  return [`MENUFLOW PRODUCTION SUMMARY`, `${s.name} - ${s.date}`, `Pickup: ${s.pickupStart}-${s.pickupEnd} @ ${s.pickupLocation}`, '', ...s.menus.map(m => `${menuOf(m.menuId)?.name}: ${cap[m.menuId].used} / ${m.capacity} portions`), `TOTAL: ${fin.length} portions`, '', 'Special dietary notes:', ...fin.filter(o => o.diet.length || o.allergies.length || o.otherAllergy || o.notes).map(o => `- ${o.id} ${o.customerName} (${short(o.finalMenu)}): ${[...o.diet.map(d => DIET[d]), ...o.allergies.map(a => 'Allergy ' + ALLERGENS[a]), o.otherAllergy, o.notes].filter(Boolean).join(', ')}`), '', 'Allergen info is provided by the canteen; cross-contamination is not guaranteed free.'].join('\n');
-}
+const planText = () => buildPlanText(buildPlan(curSession(), S().orders, S().menus));
 
 /* ---------- performance (sample data clearly labelled) ---------- */
 const BASE = { prepared: [52, 50, 55, 48, 54, 50, 53], picked: [41, 42, 43, 40, 44, 41, 43] };
