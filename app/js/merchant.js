@@ -1,5 +1,5 @@
-import { getState, mutate, quiet, resetDemo, menuOf, sessionOf, orderOf, effStatus, cutoffTs, simNow, notify } from './store.js';
-import { esc, rp, hm, clock, dateShort, ago, icon, dish, badge, statusBadge, STATUS, openModal, closeModal, toast, confirmDialog } from './ui.js';
+import { getState, mutate, quiet, resetDemo, menuOf, sessionOf, orderOf, effStatus, simNow, notify } from './store.js';
+import { esc, rp, hm, clock, dateShort, ago, icon, dish, badge, statusBadge, openModal, closeModal, toast, confirmDialog } from './ui.js';
 import { conflicts, ALLERGENS, DIET, approvedIds, capacityMap, generatePreview, summarize, validateOverride, applyOverride, confirmAllocation } from './allocation.js';
 import { buildPlan, planText as buildPlanText } from './production.js';
 import { actions, go } from './actions.js';
@@ -126,6 +126,13 @@ function saveMenu(fd, id) {
   if (!Number.isInteger(+v('capacity')) || +v('capacity') <= 0) err.push('Kapasitas harus berupa angka bulat positif.');
   const ing = v('ingredients').split(',').map(x => x.trim()).filter(Boolean);
   if (fd.get('known') && !ing.length) err.push('Isi daftar bahan sebelum menyatakan informasi lengkap.');
+  if (id && Number.isInteger(+v('capacity'))) {
+    // Never drop capacity below what is already confirmed in a session that this edit would update.
+    const st = getState();
+    const floor = Math.max(0, ...st.sessions.filter(x => ['draft', 'open', 'closed'].includes(x.status) && x.menus.some(q => q.menuId === id))
+      .map(x => capacityMap(x, st.orders)[id].used));
+    if (+v('capacity') < floor) err.push(`Kapasitas tidak boleh di bawah ${floor}, jumlah porsi yang sudah dikonfirmasi.`);
+  }
   if (err.length) return err;
   mutate(s => {
     const d = { name: v('name'), short: v('name').replace(/ Rice$/i, ''), desc: v('desc'), price: +v('price'), capacity: +v('capacity'), ingredients: ing, allergens: fd.getAll('allergens'), tags: fd.getAll('tags'), allergensKnown: !!fd.get('known') };
@@ -162,7 +169,6 @@ export function orders() {
 function orderDetail(o) {
   const s = sessionOf(o.sessionId), cap = s ? capacityMap(s, S().orders) : {};
   const req = { diet: o.diet, allergies: o.allergies, otherAllergy: o.otherAllergy };
-  const assignable = ['pending', 'unresolved'].includes(o.status) ? '' : '';
   const menusHtml = approvedIds(o).map((id, i) => { const m = menuOf(id), c = conflicts(m, req), cp = cap[id]; return `<tr><td>${i === 0 ? 'Utama' : 'Alternatif'}</td><td><b>${esc(m?.name || '(dihapus)')}</b></td><td>${m ? rp(m.price) : '-'}</td><td>${c.length ? badge(c.join(', '), 'err', 'ban') : badge('Aman untuk pelanggan ini', 'ok', 'check')}</td><td>${cp ? `${Math.max(0, cp.left)} / ${cp.capacity} tersisa` : '-'}</td></tr>`; }).join('');
   const options = approvedIds(o).filter(id => menuOf(id) && conflicts(menuOf(id), req).length === 0 && capacityMap(s, S().orders)[id]?.left > 0);
   return `<div class="row between"><div><div class="eyebrow">Detail pesanan</div><h2>${o.id}</h2></div>${statusBadge(o.status)}</div>
@@ -242,7 +248,7 @@ function pairChart(d, title) {
   return `<div class="pair"><h3 class="sub">${title}</h3><div class="pc" role="img" aria-label="${title}: porsi disiapkan dan diambil, 7 sesi">${d.prepared.map((p, i) => `<div class="pcol"><div class="pbars"><i class="c-acc" style="height:${p / max * 100}%" title="Disiapkan ${p}"></i><i class="c-first" style="height:${d.picked[i] / max * 100}%" title="Diambil ${d.picked[i]}"></i></div><small>S${i + 1}</small></div>`).join('')}</div></div>`;
 }
 export function performance() {
-  const s = curSession(), L = live(s.id), fin = L.filter(o => o.finalMenu), done = L.filter(o => ['ready', 'completed'].includes(o.status) || o.status === 'completed');
+  const s = curSession(), L = live(s.id), fin = L.filter(o => o.finalMenu);
   const processed = L.filter(o => o.status !== 'pending'), ok = processed.filter(o => o.finalMenu).length;
   const allocRate = processed.length ? Math.round(ok / processed.length * 1000) / 10 : null;
   const revenue = fin.reduce((a, o) => a + (o.finalPrice || 0), 0), aov = fin.length ? revenue / fin.length : 0;

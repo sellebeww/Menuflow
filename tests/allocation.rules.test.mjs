@@ -274,12 +274,13 @@ describe('confirmAllocation', () => {
     assert.throws(() => confirmAllocation(s, orders, ms, [{ orderId: '1', menuId: 'a' }, { orderId: '2', menuId: 'a' }]), /Kapasitas terlampaui/);
   });
 
-  it('karakterisasi: orderId ganda dihitung dua kali terhadap kapasitas (melempar)', () => {
-    assert.throws(() => confirmAllocation(s, orders, ms, [{ orderId: '1', menuId: 'a' }, { orderId: '1', menuId: 'a' }]), /Kapasitas terlampaui/);
+  it('menolak baris dengan orderId ganda', () => {
+    assert.throws(() => confirmAllocation(s, orders, ms, [{ orderId: '1', menuId: 'a' }, { orderId: '1', menuId: 'a' }]), /ganda/);
   });
 
-  it('karakterisasi: orderId tak dikenal melempar TypeError, bukan mengalokasikan', () => {
-    assert.throws(() => confirmAllocation(s, orders, ms, [{ orderId: 'hantu', menuId: 'a' }]), TypeError);
+  it('menolak orderId tak dikenal dengan galat yang jelas, juga untuk baris tanpa menu', () => {
+    assert.throws(() => confirmAllocation(s, orders, ms, [{ orderId: 'hantu', menuId: 'a' }]), /hantu: pesanan tidak dikenal/);
+    assert.throws(() => confirmAllocation(s, orders, ms, [{ orderId: 'hantu', menuId: null }]), /tidak dikenal/);
   });
 
   it('baris tanpa pesanan terkait tidak mengubah pesanan lain', () => {

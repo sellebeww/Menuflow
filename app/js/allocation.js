@@ -3,11 +3,31 @@
 // allergies/diet are hard constraints, capacity is never exceeded, FIFO queue,
 // first choices are served before alternatives. No randomness, no AI.
 
+/**
+ * @typedef {Object} Menu
+ * @property {string} id @property {string} name @property {string} [short] @property {number} price
+ * @property {boolean} active @property {boolean} allergensKnown
+ * @property {string[]} [ingredients] @property {string[]} [allergens] @property {string[]} [tags]
+ * @typedef {Object} SessionMenu @property {string} menuId @property {number} capacity
+ * @typedef {Object} Session @property {string} id @property {string} name @property {string} date
+ * @property {SessionMenu[]} menus @property {string} [pickupStart] @property {string} [pickupEnd] @property {string} [pickupLocation]
+ * @typedef {Object} Order
+ * @property {string} id @property {string} sessionId @property {string} [customerName] @property {string} primary
+ * @property {string[]} alts @property {string[]} [diet] @property {string[]} [allergies] @property {string} [otherAllergy]
+ * @property {string} [notes] @property {number} createdAt @property {string} status
+ * @property {string | null} [finalMenu] @property {string | null} [allocationType] @property {number | null} [finalPrice]
+ * @typedef {Object} Row @property {string} orderId @property {number} [queue] @property {string | null} menuId
+ * @property {string} status @property {string} [reason] @property {boolean} [manual]
+ */
+
 export const ALLERGENS = { peanuts: 'Kacang', seafood: 'Seafood', egg: 'Telur', milk: 'Susu', soy: 'Kedelai', sesame: 'Wijen', wheat: 'Gandum' };
 export const DIET = { vegetarian: 'Vegetarian', 'no-beef': 'Tanpa daging sapi', 'no-seafood': 'Tanpa seafood', 'no-spicy': 'Tidak pedas' };
 const DIET_TAG = { 'no-beef': 'beef', 'no-seafood': 'seafood', 'no-spicy': 'spicy' };
 
-/** Reasons why `menu` violates the order's hard constraints. Empty array = safe. */
+/**
+ * Reasons why `menu` violates the order's hard constraints. Empty array = safe.
+ * @param {Menu | undefined} menu @param {Order} r @returns {string[]}
+ */
 export function conflicts(menu, r) {
   if (!menu) return ['Menu tidak lagi tersedia'];
   const out = [];
@@ -18,7 +38,7 @@ export function conflicts(menu, r) {
   for (const a of allergies) if ((menu.allergens || []).includes(a)) out.push(`Mengandung ${ALLERGENS[a] || a}`);
   if (other && menu.allergensKnown) {
     const hay = [...(menu.allergens || []), ...(menu.ingredients || [])].map(s => s.toLowerCase());
-    if (hay.some(x => x.length > 2 && (x.includes(other) || other.includes(x)))) out.push(`Mengandung ${r.otherAllergy.trim()}`);
+    if (hay.some(x => x.length > 2 && (x.includes(other) || other.includes(x)))) out.push(`Mengandung ${(r.otherAllergy || '').trim()}`);
   }
   for (const d of diet) {
     if (d === 'vegetarian' && !(menu.tags || []).includes('vegetarian')) out.push('Bukan menu vegetarian');
@@ -28,11 +48,15 @@ export function conflicts(menu, r) {
 }
 
 /** The only menus an order may ever receive: primary first, then alternatives, in the customer's order. */
+/** @param {Order} o */
 export const approvedIds = o => [o.primary, ...o.alts.filter(a => a !== o.primary)];
 
+/** @param {Session} session @param {Order[]} orders @returns {Record<string, {capacity: number, used: number, left: number}>} */
 export function capacityMap(session, orders) {
+  /** @type {Record<string, number>} */
   const used = {};
   for (const o of orders) if (o.sessionId === session.id && o.finalMenu && o.status !== 'cancelled') used[o.finalMenu] = (used[o.finalMenu] || 0) + 1;
+  /** @type {Record<string, {capacity: number, used: number, left: number}>} */
   const map = {};
   for (const m of session.menus) map[m.menuId] = { capacity: m.capacity, used: used[m.menuId] || 0, left: m.capacity - (used[m.menuId] || 0) };
   return map;
@@ -45,6 +69,7 @@ const byQueue = (a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id);
  * Phase 1 serves everybody's first choice in FIFO order while capacity lasts.
  * Phase 2 serves the leftovers with the alternatives they explicitly approved, FIFO, in their own order.
  */
+/** @param {Session} session @param {Order[]} orders @param {Menu[]} menus @returns {Row[]} */
 export function generatePreview(session, orders, menus) {
   const menuById = Object.fromEntries(menus.map(m => [m.id, m]));
   const cap = capacityMap(session, orders);
@@ -116,12 +141,15 @@ export function summarize(rows, session, orders) {
 }
 
 /** Re-validates every row, then returns new orders. Throws rather than ever breaking a rule. */
+/** @param {Session} session @param {Order[]} orders @param {Menu[]} menus @param {Row[]} rows @returns {Order[]} */
 export function confirmAllocation(session, orders, menus, rows) {
   const rowOf = Object.fromEntries(rows.map(r => [r.orderId, r]));
+  if (Object.keys(rowOf).length !== rows.length) throw new Error('Baris alokasi ganda untuk satu pesanan');
   const planned = {};
   for (const r of rows) {
-    if (!r.menuId) continue;
     const o = orders.find(x => x.id === r.orderId);
+    if (!o) throw new Error(`${r.orderId}: pesanan tidak dikenal`);
+    if (!r.menuId) continue;
     if (!approvedIds(o).includes(r.menuId)) throw new Error(`${o.id}: menu tidak disetujui pelanggan`);
     const c = conflicts(menus.find(m => m.id === r.menuId), o);
     if (c.length) throw new Error(`${o.id}: ${c.join(', ')}`);
