@@ -1,4 +1,4 @@
-import { getState, subscribe, quiet, simNow, effStatus, resetDemo } from './store.js';
+import { getState, subscribe, quiet, simNow } from './store.js';
 import * as C from './customer.js';
 import * as M from './merchant.js';
 import { actions, go } from './actions.js';

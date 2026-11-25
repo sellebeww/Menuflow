@@ -5,7 +5,7 @@ let state = load();
 const subs = new Set();
 
 function load() {
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.version === 2) return s; } catch { /* private mode or corrupt */ }
+  try { const s = JSON.parse(localStorage.getItem(KEY) ?? 'null'); if (s && s.version === 2) return s; } catch { /* private mode or corrupt */ }
   return makeSeed();
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* storage unavailable: keep in memory */ } }

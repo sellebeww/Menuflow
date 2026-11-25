@@ -25,6 +25,7 @@ export function makeSeed() {
   const orders = SEED.map((s, i) => {
     const [pair, flag] = s.split(' ');
     const [p, a] = pair.split('>');
+    /** @type {import('./allocation.js').Order & Record<string, any>} */
     const o = {
       id: `SS-2026-${pad(i + 1)}`, customerId: `c-${pad(i + 1)}`, customerName: NAMES[i], sessionId: 's1', sessionName, canteen: CANTEEN, date: today,
       primary: CODE[p], alts: a.split(',').map(c => CODE[c]), diet: [], allergies: [], otherAllergy: '', notes: '',

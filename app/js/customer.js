@@ -1,5 +1,5 @@
 import { getState, mutate, quiet, menuOf, sessionOf, orderOf, effStatus, cutoffTs, simNow, notify, nextOrderId } from './store.js';
-import { esc, rp, hm, clock, dateLong, dateShort, ago, icon, dish, badge, statusBadge, STATUS, openModal, closeModal, toast, confirmDialog } from './ui.js';
+import { esc, rp, hm, clock, dateShort, ago, icon, dish, badge, statusBadge, STATUS, openModal, closeModal, toast, confirmDialog } from './ui.js';
 import { conflicts, ALLERGENS, DIET, approvedIds } from './allocation.js';
 import { actions, go } from './actions.js';
 
@@ -30,7 +30,7 @@ const OB = [
   ['Menu Final Dikonfirmasi untukmu.', 'Kamu akan menerima menu final setelah proses alokasi selesai.', 'check'],
 ];
 export function onboarding(step) {
-  const i = Math.min(2, Math.max(0, +step - 1 || 0)), [t, d, ic] = OB[i];
+  const i = Math.min(2, Math.max(0, +step - 1 || 0)), [t, d] = OB[i];
   return `<section class="ob"><button class="link skip" data-act="skipOnboarding">Lewati</button>
   <div class="ob-art" data-ob="${i}">${i === 0 ? dish('teriyaki') : i === 1 ? `<div class="ob-shield">${icon('shield', 64)}</div>` : `<div class="ob-shield ok">${icon('check', 64)}</div>`}</div>
   <h1>${t}</h1><p class="muted">${d}</p>
