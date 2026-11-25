@@ -75,6 +75,9 @@ Untuk melihat fitur cetak: buka `/app/`, masuk sebagai **Merchant**, buka **Pusa
 | `npm run dev` | server statis lokal (`PORT` mengubah port) |
 | `npm run check` | pemeriksaan sintaks semua berkas JS (`node --check`) |
 | `npm test` | tes unit dengan `node:test` |
+| `npm run lint` | ESLint 9 (config mandiri `eslint.config.js`, via `npx`, butuh jaringan) |
+| `npm run typecheck` | `tsc` dengan `checkJs` pada modul logika (`allocation`, `production`, `store`, `data`), tipe lewat JSDoc |
+| `npm run e2e` | tes e2e di Chrome/Chromium lokal (tanpa dependensi; `CHROME=/path` bila tidak terdeteksi) |
 
 Tidak ada langkah build: aplikasi berupa JavaScript ES module statis.
 
@@ -88,7 +91,9 @@ npm test
 - `tests/allocation.rules.test.mjs`: aturan alokasi, kasus tepi (kosong, stok tidak cukup, duplikat, alergi), override, konfirmasi, format uang.
 - `tests/production.test.mjs`: agregasi Rencana Produksi, termasuk acuan `tests/fixtures/production-summary.golden.txt` yang diambil dari unduhan aplikasi asli.
 
-Tes tidak bergantung pada zona waktu, locale, jam nyata, atau acak: fixture memakai stempel waktu eksplisit dan format uang memakai locale `id-ID` secara eksplisit. CI (`.github/workflows/ci.yml`) menjalankan `npm ci`, `npm run check`, dan `npm test` di Node 22 dengan `TZ=UTC`.
+- `scripts/e2e.mjs`: 7 tes end-to-end lewat Chrome DevTools Protocol (peran, alokasi hingga Rencana Produksi, tanpa overflow di 360/768px, tampilan cetak, validasi kapasitas menu, dialog dan fokus Escape). Pelari ini ditulis sendiri karena registry npm tidak terjangkau saat dikerjakan; bila Playwright dipasang kelak, alurnya bisa dipindahkan.
+
+Tes unit tidak bergantung pada zona waktu, locale, jam nyata, atau acak: fixture memakai stempel waktu eksplisit dan format uang memakai locale `id-ID` secara eksplisit. CI (`.github/workflows/ci.yml`) menjalankan `npm ci`, `npm run check`, dan `npm test` di Node 22 dengan `TZ=UTC`.
 
 ## Batasan
 

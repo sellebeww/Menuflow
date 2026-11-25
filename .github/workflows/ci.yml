@@ -20,8 +20,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Tidak ada typecheck atau build: aplikasi berupa JavaScript ES module statis.
+      # Tidak ada build: aplikasi berupa JavaScript ES module statis. ESLint dan tsc dijalankan lewat npx dengan versi dipatok.
       - name: Pemeriksaan sintaks
         run: npm run check
+      - name: Lint (ESLint)
+        run: npm run lint
+      - name: Type-check (tsc, JSDoc)
+        run: npm run typecheck
       - name: Tes
         run: npm test
+      - name: Tes e2e (Chrome bawaan runner)
+        run: npm run e2e

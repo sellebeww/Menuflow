@@ -26,8 +26,8 @@ Agregasi Rencana Produksi **tidak** murni: ia tertanam di `production()` dan `pl
 | L2 | Lebar bilah `used / capacity * 100` menghasilkan `NaN`/`Infinity` bila kapasitas 0 dan tidak dibatasi di 100% | Bilah rusak pada data tidak lazim | Persentase dihitung aman (`barPercent`), dites |
 | L3 | `production()` membaca `o.diet.length` dan `o.allergies.length` tanpa pengaman, padahal `conflicts()` memakai `|| []` | Halaman bisa error pada pesanan lama tanpa kolom itu | Diberi pengaman di modul baru, dites |
 | L4 | Total produksi (`fin.length`) menghitung pesanan yang `finalMenu`-nya tidak lagi ada di `session.menus`, sedangkan daftar per menu tidak menampilkannya | Total tidak sama dengan jumlah baris | Dicatat, dites sebagai karakterisasi, **tidak diubah** (keputusan bisnis) |
-| L5 | `saveMenu` (merchant) mengubah kapasitas semua sesi `draft/open/closed` yang memuat menu itu, termasuk sesi `closed` yang sudah punya pesanan terkonfirmasi | Kapasitas bisa turun di bawah jumlah terkonfirmasi (`left` negatif) | Dicatat sebagai temuan, **tidak diubah** |
-| L6 | `confirmAllocation` tidak menolak baris dengan `orderId` ganda (kapasitas terhitung ganda) atau `orderId` tak dikenal (melempar `TypeError`, bukan galat yang jelas) | Hanya terjadi bila baris dimanipulasi; tetap melempar | Dites sebagai karakterisasi, tidak diubah |
+| L5 | `saveMenu` (merchant) mengubah kapasitas semua sesi `draft/open/closed` yang memuat menu itu, termasuk sesi `closed` yang sudah punya pesanan terkonfirmasi | Kapasitas bisa turun di bawah jumlah terkonfirmasi (`left` negatif) | Diperbaiki: `saveMenu` menolak kapasitas di bawah porsi terkonfirmasi pada sesi yang ikut berubah; dites e2e |
+| L6 | `confirmAllocation` tidak menolak baris dengan `orderId` ganda (kapasitas terhitung ganda) atau `orderId` tak dikenal (melempar `TypeError`, bukan galat yang jelas) | Hanya terjadi bila baris dimanipulasi | Diperbaiki: `confirmAllocation` menolak dengan galat yang jelas; dites |
 | L7 | `byQueue` memakai `localeCompare` untuk imbang waktu | Urutan imbang bisa bergantung locale untuk id non-ASCII; id demo aman | Dicatat |
 | L8 | `ALLERGENS`/`otherAllergy` dicocokkan dengan pencocokan substring pada bahan | Bisa positif palsu (aman) atau negatif palsu untuk sinonim; ini batas pendekatan, bukan bug | Dicatat |
 
@@ -70,7 +70,8 @@ Diperiksa dengan `page.pdf()` Chromium (A4).
 ## E. Hal lain
 
 - Hanya satu tes dan tanpa CI; ditambahkan: 63 tes `node:test` dan workflow CI.
-- Tes e2e Playwright **belum** ada: pemasangan devDependency (`@playwright/test`) belum bisa dilakukan pada sesi ini. Verifikasi 360px, cetak, kontras, dan keyboard dilakukan dengan skrip Playwright sekali pakai (di luar repo) pada Chromium terpasang; hasilnya dirangkum di PR.
+- Tes e2e: `npm run e2e` (`scripts/e2e.mjs`, tanpa dependensi, Chrome DevTools Protocol). Playwright tidak dipasang karena registry npm tidak terjangkau saat dikerjakan.
+- Lint dan type-check: `npm run lint` (ESLint 9.34) dan `npm run typecheck` (TypeScript 5.9, `strict` + `checkJs` pada modul logika). Dijalankan dengan salinan lokal versi yang sama; temuan lint (impor dan variabel tak terpakai di `customer.js`, `main.js`, `merchant.js`) dan satu penanganan `null` di `store.js` sudah diperbaiki. File UI belum dicek tipe: ada 38 galat tipe DOM (`Element` vs `HTMLElement`) yang butuh cast, bukan bug logika.
 - Hasil cetak A4 dua halaman (kartu "Status pengambilan" pindah utuh ke halaman 2, tidak terpotong). Bukti: `docs/verification/print-a4-1.png` (font cadangan karena Google Fonts diblokir saat verifikasi).
 - Font Google Fonts dimuat dari jaringan; tanpa jaringan, font cadangan dipakai. Tidak diubah.
 - Tidak ada linter/typecheck pada repo; ditambahkan hanya `npm run check` (sintaks). Menambah ESLint/TypeScript dianggap di luar mode aman minimal dan dicatat di PR.
